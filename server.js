@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 
 // ── APP ──
 const app  = express();
@@ -41,8 +42,6 @@ app.post('/auth/bootstrap', async (req, res) => {
     if (key !== process.env.BOOTSTRAP_KEY) {
       return res.status(403).json({ error: 'Invalid bootstrap key' });
     }
-
-    const bcrypt = require('bcrypt');
 
     const hash = await bcrypt.hash(password, 10);
 
