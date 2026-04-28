@@ -1,20 +1,29 @@
+const express = require('express');
+const router = express.Router();
 const pool = require('../db');
+const bcrypt = require('bcryptjs');
 
-function requirePermission(permission) {
-  return async (req, res, next) => {
-    const userId = req.user.id;
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
 
-    const resPerm = await pool.query(
-      'SELECT * FROM permissions WHERE user_id = $1 AND permission = $2',
-      [userId, permission]
-    );
+  const result = await pool.query(
+    'SELECT * FROM users WHERE username = $1',
+    [username]
+  );
 
-    if (resPerm.rows.length === 0) {
-      return res.status(403).json({ error: 'No permission' });
-    }
+  const user = result.rows[0];
+  if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
-    next();
-  };
-}
+  const valid = await bcrypt.compare(password, user.password_hash);
+  if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
-module.exports = requirePermission;
+  res.cookie('uid', user.id, {
+    httpOnly: true,
+    sameSite: 'None',
+    secure: true
+  });
+
+  res.json({ success: true });
+});
+
+module.exports = router;
