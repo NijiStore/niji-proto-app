@@ -28,7 +28,7 @@ const authRoutes = require('./routes/auth');
 
 // mount routes
 
-app.get('/auth/bootstrap', async (req, res) => {
+app.post('/auth/bootstrap', async (req, res) => {
   try {
     console.log('BOOTSTRAP HIT');
 
