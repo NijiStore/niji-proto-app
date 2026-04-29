@@ -67,4 +67,13 @@ router.delete('/permissions', async (req, res) => {
   res.json({ success: true });
 });
 
+router.delete('/users/:id', async (req, res) => {
+  if (req.user.id === req.params.id) {
+    return res.status(400).json({ error: "You can't delete yourself" });
+  }
+
+  await pool.query('DELETE FROM users WHERE id = $1', [req.params.id]);
+  res.json({ success: true });
+});
+
 module.exports = router;
