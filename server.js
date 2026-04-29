@@ -26,6 +26,8 @@ app.get('/', (req, res) => {
 // ── ROUTES ──
 const protojournalRoutes = require('./routes/protojournal');
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
+
 
 // mount routes
 
@@ -41,6 +43,7 @@ app.get('/test-db', async (req, res) => {
 
 app.use('/api/protojournal', protojournalRoutes);
 app.use('/auth', authRoutes);
+app.use('/admin', adminRoutes);
 
 // ── START ──
 app.listen(PORT, () => {
