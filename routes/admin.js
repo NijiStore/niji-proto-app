@@ -28,6 +28,24 @@ router.post('/users', async (req, res) => {
   res.json(result.rows[0]);
 });
 
+router.patch('/users/:id/password', auth, requirePermission('admin:access'), async (req, res) => {
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ error: 'Password required' });
+  }
+
+  const bcrypt = require('bcryptjs');
+  const hash = await bcrypt.hash(password, 10);
+
+  await pool.query(
+    'UPDATE users SET password_hash = $1 WHERE id = $2',
+    [hash, req.params.id]
+  );
+
+  res.json({ success: true });
+});
+
 // DELETE user
 router.delete('/users/:id', async (req, res) => {
   await pool.query('DELETE FROM users WHERE id = $1', [req.params.id]);
