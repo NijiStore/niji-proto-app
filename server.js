@@ -10,8 +10,10 @@ const PORT = process.env.PORT || 3000;
 
 // ── MIDDLEWARE ──
 app.use(cors({
-  origin: ['https://nijistore.github.io'],
+  origin: 'https://nijistore.github.io',
   credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
 }));
 app.use(cookieParser());
 app.use(express.json());
