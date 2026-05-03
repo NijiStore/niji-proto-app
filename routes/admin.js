@@ -10,7 +10,11 @@ router.use(auth, requirePermission('admin:access'));
 
 // GET all users
 router.get('/users', async (req, res) => {
-  const result = await pool.query('SELECT id, username FROM users');
+  const result = await pool.query(`
+    SELECT u.id, u.username, u.role_id, r.name AS role
+    FROM users u
+    LEFT JOIN roles r ON u.role_id = r.id
+  `);
   res.json(result.rows);
 });
 
@@ -41,6 +45,21 @@ router.patch('/users/:id/password', auth, requirePermission('admin:access'), asy
   await pool.query(
     'UPDATE users SET password_hash = $1 WHERE id = $2',
     [hash, req.params.id]
+  );
+
+  res.json({ success: true });
+});
+
+router.patch('/users/:id/role', auth, requirePermission('admin:access'), async (req, res) => {
+  const { roleId } = req.body;
+
+  if (!roleId) {
+    return res.status(400).json({ error: 'roleId required' });
+  }
+
+  await pool.query(
+    'UPDATE users SET role_id = $1 WHERE id = $2',
+    [roleId, req.params.id]
   );
 
   res.json({ success: true });
